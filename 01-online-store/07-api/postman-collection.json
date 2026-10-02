@@ -1,0 +1,316 @@
+{
+  "info": {
+    "name": "Интернет-магазин API",
+    "description": "Коллекция запросов, соответствующая openapi.yaml. Переменные окружения: baseUrl, accessToken, productId, orderId.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://api.example-shop.ru/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "productId", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Регистрация",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Иван Иванов\",\n  \"email\": \"ivan@example.com\",\n  \"password\": \"StrongPass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Вход",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ivan@example.com\",\n  \"password\": \"StrongPass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Запросить восстановление пароля",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/password-reset/request",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"ivan@example.com\"\n}" }
+          }
+        },
+        {
+          "name": "Подтвердить восстановление пароля",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/password-reset/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ivan@example.com\",\n  \"code\": \"123456\",\n  \"newPassword\": \"NewStrongPass123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "item": [
+        {
+          "name": "Список категорий",
+          "request": { "method": "GET", "url": "{{baseUrl}}/categories" }
+        },
+        {
+          "name": "Список товаров (фильтр + поиск)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products?category_id=&price_min=&price_max=&q=&sort=price_asc&page=1&pageSize=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                { "key": "category_id", "value": "" },
+                { "key": "price_min", "value": "" },
+                { "key": "price_max", "value": "" },
+                { "key": "q", "value": "" },
+                { "key": "sort", "value": "price_asc" },
+                { "key": "page", "value": "1" },
+                { "key": "pageSize", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Карточка товара",
+          "request": { "method": "GET", "url": "{{baseUrl}}/products/{{productId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Получить корзину",
+          "request": { "method": "GET", "url": "{{baseUrl}}/cart" }
+        },
+        {
+          "name": "Добавить товар в корзину",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/cart/items",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"quantity\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Изменить количество позиции",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/cart/items/:itemId",
+            "body": { "mode": "raw", "raw": "{\n  \"quantity\": 2\n}" }
+          }
+        },
+        {
+          "name": "Удалить позицию из корзины",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/cart/items/:itemId" }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Оформить заказ",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shippingAddress\": \"г. Москва, ул. Примерная, д. 1\",\n  \"paymentMethod\": \"bank_card\",\n  \"guestName\": \"\",\n  \"guestContact\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "История заказов",
+          "request": { "method": "GET", "url": "{{baseUrl}}/orders?status=&page=1" }
+        },
+        {
+          "name": "Детали заказа",
+          "request": { "method": "GET", "url": "{{baseUrl}}/orders/{{orderId}}" }
+        },
+        {
+          "name": "Отменить заказ",
+          "request": { "method": "POST", "url": "{{baseUrl}}/orders/{{orderId}}/cancel" }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Инициировать оплату",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/orders/{{orderId}}/payment",
+            "body": { "mode": "raw", "raw": "{\n  \"method\": \"bank_card\"\n}" }
+          }
+        },
+        {
+          "name": "Webhook от платёжного шлюза (для тестирования локально)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/payments/webhook",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentId\": \"00000000-0000-0000-0000-000000000000\",\n  \"status\": \"succeeded\",\n  \"gatewayTransactionId\": \"gw_test_123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        {
+          "name": "Забронировать товар",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/reservations",
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{productId}}\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "item": [
+        {
+          "name": "Список избранного",
+          "request": { "method": "GET", "url": "{{baseUrl}}/favorites" }
+        },
+        {
+          "name": "Добавить в избранное",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/favorites",
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{productId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Удалить из избранного",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/favorites/{{productId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "item": [
+        {
+          "name": "Текущий профиль",
+          "request": { "method": "GET", "url": "{{baseUrl}}/account/me" }
+        },
+        {
+          "name": "Редактировать профиль",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/account/me",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Иван Петров\",\n  \"phone\": \"+7 900 000-00-00\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Удалить аккаунт",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/account/me",
+            "body": { "mode": "raw", "raw": "{\n  \"password\": \"StrongPass123\"\n}" }
+          }
+        },
+        {
+          "name": "Обратиться за консультацией",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/account/consultation-requests",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Подскажите размер фигурки?\",\n  \"contact\": \"ivan@example.com\",\n  \"productId\": \"{{productId}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Добавить товар",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/admin/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"\",\n  \"name\": \"Фигурка персонажа\",\n  \"description\": \"...\",\n  \"price\": 2500,\n  \"stockQuantity\": 10,\n  \"photoUrl\": \"https://...\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Редактировать товар / остаток",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/admin/products/{{productId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"stockQuantity\": 5\n}" }
+          }
+        },
+        {
+          "name": "Удалить / деактивировать товар",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/admin/products/{{productId}}" }
+        },
+        {
+          "name": "Список всех заказов",
+          "request": { "method": "GET", "url": "{{baseUrl}}/admin/orders?status=&customerId=" }
+        },
+        {
+          "name": "Изменить статус заказа",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/admin/orders/{{orderId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"processing\"\n}" }
+          }
+        },
+        {
+          "name": "История покупок покупателя",
+          "request": { "method": "GET", "url": "{{baseUrl}}/admin/customers/:customerId/orders" }
+        }
+      ]
+    }
+  ]
+}

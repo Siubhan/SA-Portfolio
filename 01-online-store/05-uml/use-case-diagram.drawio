@@ -16,67 +16,67 @@
         <mxCell id="n6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fontSize=14;fillColor=default;strokeColor=#000000;dashed=0;strokeWidth=3;" value="Интернет-магазин" vertex="1">
           <mxGeometry height="1010" width="1130" x="60" y="30" as="geometry" />
         </mxCell>
-        <mxCell id="n7" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Просмотр каталога" vertex="1">
+        <mxCell id="n7" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="FR-01: Просмотр каталога" vertex="1">
           <mxGeometry height="55" width="190" x="170" y="90" as="geometry" />
         </mxCell>
-        <mxCell id="n8" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Фильтрация товаров" vertex="1">
+        <mxCell id="n8" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-01: Фильтрация товаров" vertex="1">
           <mxGeometry height="55" width="190" x="330" y="168" as="geometry" />
         </mxCell>
-        <mxCell id="n9" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Поиск товара" vertex="1">
+        <mxCell id="n9" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-04: Поиск товара" vertex="1">
           <mxGeometry height="55" width="190" x="240" y="245" as="geometry" />
         </mxCell>
-        <mxCell id="n10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Управление избранным" vertex="1">
+        <mxCell id="n10" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-03: Управление избранным" vertex="1">
           <mxGeometry height="55" width="190" x="340" y="340" as="geometry" />
         </mxCell>
-        <mxCell id="n11" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Управление корзиной" vertex="1">
+        <mxCell id="n11" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-05: Управление корзиной" vertex="1">
           <mxGeometry height="55" width="190" x="390" y="465" as="geometry" />
         </mxCell>
-        <mxCell id="n12" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Бронирование товара" vertex="1">
+        <mxCell id="n12" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-04: Бронирование товара" vertex="1">
           <mxGeometry height="55" width="190" x="320" y="560" as="geometry" />
         </mxCell>
-        <mxCell id="n13" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Обращение за консультацией" vertex="1">
+        <mxCell id="n13" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-14: Обращение за консультацией" vertex="1">
           <mxGeometry height="55" width="190" x="160" y="715" as="geometry" />
         </mxCell>
-        <mxCell id="n14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Оформление заказа" vertex="1">
+        <mxCell id="n14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-01: Оформление заказа" vertex="1">
           <mxGeometry height="55" width="190" x="450" y="90" as="geometry" />
         </mxCell>
-        <mxCell id="n15" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Выбор способа оплаты" vertex="1">
+        <mxCell id="n15" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-07: Выбор способа оплаты" vertex="1">
           <mxGeometry height="55" width="190" x="650" y="205" as="geometry" />
         </mxCell>
-        <mxCell id="n16" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Оплата заказа" vertex="1">
+        <mxCell id="n16" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-07: Оплата заказа" vertex="1">
           <mxGeometry height="55" width="190" x="870" y="130" as="geometry" />
         </mxCell>
-        <mxCell id="n17" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Гостевой чекаут" vertex="1">
+        <mxCell id="n17" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-06: Гостевой чекаут" vertex="1">
           <mxGeometry height="55" width="190" x="780" y="50" as="geometry" />
         </mxCell>
-        <mxCell id="n18" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Отмена заказа" vertex="1">
+        <mxCell id="n18" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-05: Отмена заказа" vertex="1">
           <mxGeometry height="55" width="190" x="540" y="520" as="geometry" />
         </mxCell>
-        <mxCell id="n19" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Возврат оплаты" vertex="1">
+        <mxCell id="n19" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-05: Возврат оплаты" vertex="1">
           <mxGeometry height="55" width="190" x="780" y="660" as="geometry" />
         </mxCell>
-        <mxCell id="n20" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Регистрация" vertex="1">
+        <mxCell id="n20" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-02: Регистрация" vertex="1">
           <mxGeometry height="55" width="190" x="120" y="615" as="geometry" />
         </mxCell>
-        <mxCell id="n21" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Восстановление пароля" vertex="1">
+        <mxCell id="n21" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="UC-03: Восстановление пароля" vertex="1">
           <mxGeometry height="55" width="190" x="400" y="630" as="geometry" />
         </mxCell>
-        <mxCell id="n22" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Редактирование профиля" vertex="1">
+        <mxCell id="n22" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-11: Редактирование профиля" vertex="1">
           <mxGeometry height="55" width="190" x="460" y="280" as="geometry" />
         </mxCell>
-        <mxCell id="n23" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Удаление аккаунта" vertex="1">
+        <mxCell id="n23" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-12: Удаление аккаунта" vertex="1">
           <mxGeometry height="55" width="190" x="510" y="395" as="geometry" />
         </mxCell>
-        <mxCell id="n24" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Просмотр истории покупок" vertex="1">
+        <mxCell id="n24" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="US-13: Просмотр истории покупок" vertex="1">
           <mxGeometry height="55" width="190" x="710" y="450" as="geometry" />
         </mxCell>
-        <mxCell id="n25" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Управление каталогом и остатками" vertex="1">
+        <mxCell id="n25" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="UC-07: Управление каталогом и остатками" vertex="1">
           <mxGeometry height="55" width="190" x="210" y="920" as="geometry" />
         </mxCell>
-        <mxCell id="n26" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Обработка заказов" vertex="1">
+        <mxCell id="n26" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="UC-06: Обработка заказов" vertex="1">
           <mxGeometry height="55" width="190" x="330" y="800" as="geometry" />
         </mxCell>
-        <mxCell id="n27" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Просмотр истории покупателя" vertex="1">
+        <mxCell id="n27" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="US-16: Просмотр истории покупателя" vertex="1">
           <mxGeometry height="55" width="190" x="690" y="790" as="geometry" />
         </mxCell>
         <mxCell id="e0" edge="1" parent="1" source="n3" style="endArrow=none;html=1;rounded=0;strokeColor=default;edgeStyle=entityRelationEdgeStyle;" target="n7" value="">

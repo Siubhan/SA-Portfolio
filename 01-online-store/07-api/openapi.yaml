@@ -1,0 +1,820 @@
+openapi: 3.1.0
+info:
+  title: Интернет-магазин API
+  description: >
+    REST API для интернет-магазина мерча. Покрывает каталог, корзину,
+    оформление заказа, оплату, бронирование, личный кабинет и админ-панель.
+  version: "1.0.0"
+
+servers:
+  - url: https://api.example-shop.ru/v1
+
+tags:
+  - name: Auth
+  - name: Catalog
+  - name: Cart
+  - name: Orders
+  - name: Payments
+  - name: Reservations
+  - name: Favorites
+  - name: Account
+  - name: Admin
+
+# ============================================================
+# PATHS
+# ============================================================
+paths:
+
+  # ---------------- Auth ----------------
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Регистрация аккаунта
+      description: FR-17
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+      responses:
+        "201":
+          description: Аккаунт создан
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "409":
+          description: Email уже занят
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Вход
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        "200":
+          description: Успешный вход
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthResponse" }
+        "401":
+          description: Неверный email или пароль
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /auth/password-reset/request:
+    post:
+      tags: [Auth]
+      summary: Запросить восстановление пароля
+      description: FR-18
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "202":
+          description: Если email существует, код отправлен (ответ одинаков в обоих случаях — защита от перебора)
+
+  /auth/password-reset/confirm:
+    post:
+      tags: [Auth]
+      summary: Подтвердить восстановление пароля по коду
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, code, newPassword]
+              properties:
+                email: { type: string, format: email }
+                code: { type: string }
+                newPassword: { type: string, minLength: 8 }
+      responses:
+        "200":
+          description: Пароль изменён
+        "400":
+          description: Код недействителен или истёк
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # ---------------- Catalog ----------------
+  /categories:
+    get:
+      tags: [Catalog]
+      summary: Список категорий
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Category" }
+
+  /products:
+    get:
+      tags: [Catalog]
+      summary: Список товаров с фильтрацией, поиском, сортировкой
+      description: FR-01, FR-02, FR-03, FR-04, FR-05
+      parameters:
+        - name: category_id
+          in: query
+          schema: { type: string, format: uuid }
+        - name: price_min
+          in: query
+          schema: { type: number }
+        - name: price_max
+          in: query
+          schema: { type: number }
+        - name: q
+          in: query
+          description: Поисковая строка (по названию — FR-03; по описанию — FR-05)
+          schema: { type: string }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [price_asc, price_desc, popularity] }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/Product" }
+                  total: { type: integer }
+                  page: { type: integer }
+                  pageSize: { type: integer }
+
+  /products/{productId}:
+    get:
+      tags: [Catalog]
+      summary: Карточка товара
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        "404":
+          description: Товар не найден
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # ---------------- Cart ----------------
+  /cart:
+    get:
+      tags: [Cart]
+      summary: Получить текущую корзину
+      description: Для гостя — корзина привязана к сессии (cookie/token), для покупателя — к аккаунту
+      security: [{ bearerAuth: [], guestSession: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+
+  /cart/items:
+    post:
+      tags: [Cart]
+      summary: Добавить товар в корзину
+      description: FR-08
+      security: [{ bearerAuth: [], guestSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, quantity]
+              properties:
+                productId: { type: string, format: uuid }
+                quantity: { type: integer, minimum: 1 }
+      responses:
+        "201":
+          description: Товар добавлен
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+        "409":
+          description: Недостаточно товара на складе
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /cart/items/{itemId}:
+    patch:
+      tags: [Cart]
+      summary: Изменить количество позиции в корзине
+      description: FR-12
+      security: [{ bearerAuth: [], guestSession: [] }]
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+    delete:
+      tags: [Cart]
+      summary: Удалить позицию из корзины
+      description: FR-11
+      security: [{ bearerAuth: [], guestSession: [] }]
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "204":
+          description: Удалено
+
+  # ---------------- Orders ----------------
+  /orders:
+    post:
+      tags: [Orders]
+      summary: Оформить заказ
+      description: FR-09, FR-13. Покрывает UC-01 (шаги 1-5)
+      security: [{ bearerAuth: [], guestSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateOrderRequest" }
+      responses:
+        "201":
+          description: Заказ создан, статус new
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "409":
+          description: Один или несколько товаров закончились на складе (UC-01, исключение)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    get:
+      tags: [Orders]
+      summary: История заказов покупателя
+      description: FR-23
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/OrderStatus" }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Order" }
+
+  /orders/{orderId}:
+    get:
+      tags: [Orders]
+      summary: Детали заказа
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "404":
+          description: Не найден
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /orders/{orderId}/cancel:
+    post:
+      tags: [Orders]
+      summary: Отменить заказ
+      description: FR-15. Покрывает UC-05
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      responses:
+        "200":
+          description: Заказ отменён (статус cancelled); если был оплачен — инициирован возврат
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "409":
+          description: Заказ уже отправлен/выполнен — отмена недоступна (UC-05, альт. 3a)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # ---------------- Payments ----------------
+  /orders/{orderId}/payment:
+    post:
+      tags: [Payments]
+      summary: Инициировать оплату заказа
+      description: FR-13, FR-14. Покрывает UC-01 (шаги 6-8) и Sequence Diagram «Оплата заказа»
+      security: [{ bearerAuth: [], guestSession: [] }]
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [method]
+              properties:
+                method: { type: string, example: "bank_card" }
+      responses:
+        "200":
+          description: Возвращает ссылку на страницу оплаты платёжного шлюза
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paymentUrl: { type: string, format: uri }
+                  paymentId: { type: string, format: uuid }
+
+  /payments/webhook:
+    post:
+      tags: [Payments]
+      summary: Webhook от платёжного шлюза
+      description: >
+        Вызывается платёжным шлюзом асинхронно после обработки платежа.
+        См. Sequence Diagram «Оплата заказа». Не предназначен для вызова с фронтенда.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [paymentId, status]
+              properties:
+                paymentId: { type: string, format: uuid }
+                status: { type: string, enum: [succeeded, failed] }
+                gatewayTransactionId: { type: string }
+      responses:
+        "200":
+          description: Webhook принят
+
+  # ---------------- Reservations ----------------
+  /reservations:
+    post:
+      tags: [Reservations]
+      summary: Забронировать товар при отсутствии на складе
+      description: FR-10. Покрывает UC-04
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId]
+              properties:
+                productId: { type: string, format: uuid }
+      responses:
+        "201":
+          description: Бронь создана
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reservation" }
+        "409":
+          description: Товар уже есть в наличии — бронирование не требуется
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # ---------------- Favorites ----------------
+  /favorites:
+    get:
+      tags: [Favorites]
+      summary: Список избранных товаров
+      description: FR-21
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+    post:
+      tags: [Favorites]
+      summary: Добавить товар в избранное
+      description: FR-21
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId]
+              properties:
+                productId: { type: string, format: uuid }
+      responses:
+        "201":
+          description: Добавлено
+
+  /favorites/{productId}:
+    delete:
+      tags: [Favorites]
+      summary: Удалить товар из избранного
+      description: FR-22
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "204":
+          description: Удалено
+
+  # ---------------- Account ----------------
+  /account/me:
+    get:
+      tags: [Account]
+      summary: Текущий профиль
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+    patch:
+      tags: [Account]
+      summary: Редактировать профиль
+      description: FR-19
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                phone: { type: string }
+                email: { type: string, format: email }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+    delete:
+      tags: [Account]
+      summary: Удалить аккаунт
+      description: FR-20
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password: { type: string, description: Подтверждение паролем }
+      responses:
+        "204":
+          description: Аккаунт удалён
+
+  /account/consultation-requests:
+    post:
+      tags: [Account]
+      summary: Обратиться за консультацией
+      description: FR-24
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, contact]
+              properties:
+                message: { type: string }
+                contact: { type: string }
+                productId: { type: string, format: uuid }
+      responses:
+        "201":
+          description: Обращение принято
+
+  # ---------------- Admin ----------------
+  /admin/products:
+    post:
+      tags: [Admin]
+      summary: Добавить товар
+      description: FR-25. Покрывает UC-07
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductInput" }
+      responses:
+        "201":
+          description: Создано
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+
+  /admin/products/{productId}:
+    patch:
+      tags: [Admin]
+      summary: Редактировать товар / остаток
+      description: FR-25, FR-26
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+    delete:
+      tags: [Admin]
+      summary: Удалить товар (или деактивировать, если есть незавершённые заказы)
+      description: FR-25. Покрывает UC-07, исключение
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "204":
+          description: Удалено
+        "200":
+          description: Товар деактивирован вместо удаления (есть незавершённые заказы)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+
+  /admin/orders:
+    get:
+      tags: [Admin]
+      summary: Список всех заказов
+      description: FR-27
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/OrderStatus" }
+        - name: customerId
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Order" }
+
+  /admin/orders/{orderId}/status:
+    patch:
+      tags: [Admin]
+      summary: Изменить статус заказа
+      description: FR-27. Покрывает UC-06
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: "#/components/schemas/OrderStatus" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "422":
+          description: Недопустимый переход статуса (UC-06, альт. 5a)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /admin/customers/{customerId}/orders:
+    get:
+      tags: [Admin]
+      summary: История покупок конкретного покупателя
+      description: FR-28
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Order" }
+
+# ============================================================
+# COMPONENTS
+# ============================================================
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    guestSession:
+      type: apiKey
+      in: cookie
+      name: guest_session_id
+      description: Идентификатор гостевой сессии для корзины/заказа без регистрации
+
+  parameters:
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    OrderId:
+      name: orderId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        code: { type: string, example: "OUT_OF_STOCK" }
+        message: { type: string }
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        customer: { $ref: "#/components/schemas/Customer" }
+
+    Customer:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    Category:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+
+    Product:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        categoryId: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        price: { type: number, format: decimal }
+        stockQuantity: { type: integer }
+        photoUrl: { type: string, format: uri }
+        isActive: { type: boolean }
+
+    ProductInput:
+      type: object
+      required: [categoryId, name, price, stockQuantity]
+      properties:
+        categoryId: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        price: { type: number }
+        stockQuantity: { type: integer }
+        photoUrl: { type: string, format: uri }
+
+    Cart:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string, format: uuid }
+              product: { $ref: "#/components/schemas/Product" }
+              quantity: { type: integer }
+        totalAmount: { type: number }
+
+    OrderStatus:
+      type: string
+      enum: [new, awaiting_payment, paid, processing, shipped, completed, cancelled]
+
+    CreateOrderRequest:
+      type: object
+      required: [shippingAddress, paymentMethod]
+      properties:
+        shippingAddress: { type: string }
+        paymentMethod: { type: string }
+        guestName:
+          type: string
+          description: Обязательно, если покупатель не авторизован
+        guestContact:
+          type: string
+          description: Обязательно, если покупатель не авторизован
+
+    OrderItem:
+      type: object
+      properties:
+        productId: { type: string, format: uuid }
+        productName: { type: string }
+        quantity: { type: integer }
+        priceAtOrder: { type: number }
+
+    Order:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        status: { $ref: "#/components/schemas/OrderStatus" }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/OrderItem" }
+        totalAmount: { type: number }
+        shippingAddress: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    Reservation:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        productId: { type: string, format: uuid }
+        status: { type: string, enum: [active, fulfilled, expired, cancelled] }
+        expiresAt: { type: string, format: date-time }
